@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="resource.NewsMapper">
+ 	<select id="selectNews"  resultType="vo.NewsVO">
+    	select id, writer,
+        	title, content,
+          	  to_char(writedate, 'yyyy-mm-dd"T"hh24:mi')writedate ,cnt from news
+ 	</select>
+ 	<!-- String key String searchType -->
+  	<!-- <select id="searchNews"  parameterType="string" resultType="vo.NewsVO">
+    	select id, writer, title, content, to_char(writedate, 'yyyy/mm/dd HH24:mi'), cnt from news where
+    			 searchType	"like'%"key "%'
+    </select> -->
+   <insert id="insertNews"  parameterType="vo.NewsVO">
+  		<selectKey resultType="int" keyProperty="id" order="BEFORE">
+      		select news_seq.nextval from dual     
+    	</selectKey>  
+    						<!-- 여기 첫째줄에 컬럼명쓰고 둘째줄에 값넣기 -->
+    		insert into news (id, writer, title, content, writedate ,cnt) 
+    						  values(#{id},#{writer}, #{title}, #{content}, to_date(#{writedate}, 'yyyy-mm-dd"T"hh24:mi'), 0)				  
+	</insert>	
+ 	<delete id="deleteNews"  parameterType="_int"  >
+    	delete from news where id = #{id}
+	</delete>
+	
+	<!-- search  -->
+	<select id="searchNews"  parameterType="map" resultType="vo.NewsVO">
+    	select * from news where ${searchType} LIKE '%' || #{key} || '%'
+    	<!-- select id, writer, title, content, writedate, cnt from news '%'||#{key}||'%'-->
+ 	</select>
+	
+	<!-- listOne  -->
+ 	<select id="listOneNews" resultType="vo.NewsVO" parameterType="_int" >
+ 		 		SELECT ID, WRITER, TITLE, CONTENT, 
+ 				TO_CHAR(WRITEDATE, 'yyyy-mm-dd"T"hh24:mi') writedate, CNT
+					FROM NEWS WHERE ID = #{id} 				
+ 	</select>
+ 	
+ 	<!-- update  -->
+	<update id="updateNews"  parameterType="vo.NewsVO"  >
+		UPDATE NEWS SET 
+					WRITER = #{writer}, 
+					TITLE = #{title},
+					CONTENT = #{content},
+					CNT = #{cnt},
+					WRITEDATE = TO_DATE(#{writedate}, 'yyyy-mm-dd"T"hh24:mi') 
+		WHERE ID = #{id}
+	</update>
+</mapper>
